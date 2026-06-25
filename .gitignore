@@ -46,3 +46,12 @@ logs/
 ### OS ###
 .DS_Store
 Thumbs.db
+
+.playwright-cli/
+.env
+.env.*
+application-local.properties
+application-dev.properties
+application-prod.properties
+*.log
+logs/
