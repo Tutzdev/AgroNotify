@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - AgroNotify</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body data-pagina="clientes">
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="dashboard.html">
+                <span class="marca-simbolo">A</span>
+                <span>AgroNotify</span>
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="dashboard.html">Dashboard</a>
+                <a class="ativo" href="clientes.html">Clientes</a>
+                <a href="novo-cliente.html">Novo Cliente</a>
+                <button class="menu-sair" type="button" id="logoutBtn">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <div class="titulo-pagina">
+            <div>
+                <h1>Clientes</h1>
+                <p>Consulte e gerencie os clientes cadastrados.</p>
+            </div>
+            <a class="botao botao-principal" href="novo-cliente.html">Novo Cliente</a>
+        </div>
+
+        <section class="painel">
+            <div class="acoes">
+                <input type="search" id="termoBusca" placeholder="Nome, telefone ou produto" aria-label="Buscar cliente">
+                <button class="botao botao-principal" type="button" id="buscarBtn">Buscar</button>
+                <button class="botao botao-secundario" type="button" id="listarBtn">Listar todos</button>
+            </div>
+
+            <p id="mensagem" class="mensagem"></p>
+
+            <div class="tabela-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Produto</th>
+                            <th>Data de cadastro</th>
+                            <th>Data de envio</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaClientes"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

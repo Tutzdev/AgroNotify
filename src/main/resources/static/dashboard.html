@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AgroNotify</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body data-pagina="dashboard">
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="dashboard.html">
+                <span class="marca-simbolo">A</span>
+                <span>AgroNotify</span>
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a class="ativo" href="dashboard.html">Dashboard</a>
+                <a href="clientes.html">Clientes</a>
+                <a href="novo-cliente.html">Novo Cliente</a>
+                <button class="menu-sair" type="button" id="logoutBtn">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <div class="titulo-pagina">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Resumo geral do AgroNotify.</p>
+            </div>
+        </div>
+
+        <section class="cards-dashboard" aria-label="Resumo do sistema">
+            <article class="card-resumo">
+                <span>Total de clientes</span>
+                <strong id="totalClientes">0</strong>
+            </article>
+
+            <article class="card-resumo">
+                <span>Mensagens pendentes</span>
+                <strong id="mensagensPendentes">0</strong>
+            </article>
+
+            <article class="card-resumo">
+                <span>Mensagens enviadas</span>
+                <strong id="mensagensEnviadas">0</strong>
+            </article>
+        </section>
+
+        <p id="mensagem" class="mensagem"></p>
+    </main>
+</body>
+</html>

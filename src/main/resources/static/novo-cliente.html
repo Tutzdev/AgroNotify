@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Cliente - AgroNotify</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body data-pagina="novo-cliente">
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="dashboard.html">
+                <span class="marca-simbolo">A</span>
+                <span>AgroNotify</span>
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="clientes.html">Clientes</a>
+                <a class="ativo" href="novo-cliente.html">Novo Cliente</a>
+                <button class="menu-sair" type="button" id="logoutBtn">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <div class="titulo-pagina">
+            <div>
+                <h1>Novo Cliente</h1>
+                <p>Preencha os dados para cadastrar um cliente.</p>
+            </div>
+        </div>
+
+        <section class="painel formulario-painel">
+            <form id="novoClienteForm">
+                <div class="campo">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+
+                <div class="campo">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" name="telefone" required>
+                </div>
+
+                <div class="campo">
+                    <label for="produto">Produto</label>
+                    <input type="text" id="produto" name="produto" required>
+                </div>
+
+                <div class="acoes-formulario">
+                    <button class="botao botao-principal" type="submit">Cadastrar</button>
+                    <a class="botao botao-secundario" href="clientes.html">Cancelar</a>
+                </div>
+            </form>
+
+            <p id="mensagem" class="mensagem"></p>
+        </section>
+    </main>
+</body>
+</html>
