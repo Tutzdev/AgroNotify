@@ -12,6 +12,11 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
             LocalDate dataEnvio
     );
 
+    List<Cliente> findTop5ByStatusEnvioAndDataEnvioLessThanEqualOrderByDataEnvioAsc(
+            StatusEnvio statusEnvio,
+            LocalDate dataEnvio
+    );
+
     List<Cliente> findByNomeContainingIgnoreCaseOrTelefoneContainingIgnoreCaseOrProdutoContainingIgnoreCase(
             String nome,
             String telefone,

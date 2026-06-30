@@ -2,6 +2,7 @@ package com.agronotify.cliente;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -9,6 +10,10 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private static final Comparator<Cliente> ORDEM_PRIORIDADE = Comparator
+            .comparing((Cliente cliente) -> cliente.getStatusEnvio() == StatusEnvio.PENDENTE ? 0 : 1)
+            .thenComparing(Cliente::getDataEnvio, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(Cliente::getNome, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
@@ -18,13 +23,14 @@ public class ClienteService {
 
         Cliente cliente = new Cliente();
 
+        LocalDate dataCadastro = LocalDate.now();
+
         cliente.setNome(request.getNome());
         cliente.setTelefone(request.getTelefone());
         cliente.setProduto(request.getProduto());
-        cliente.setMensagem(mensagemDoRequest(request));
-
-        cliente.setDataCadastro(LocalDate.now());
+        cliente.setDataCadastro(dataCadastro);
         cliente.setDataEnvio(request.getDataEnvio());
+        cliente.setMensagem(mensagemDoRequest(request, dataCadastro, request.getDataEnvio()));
         cliente.setStatusEnvio(StatusEnvio.PENDENTE);
 
         Cliente clienteSalvo = clienteRepository.save(cliente);
@@ -35,6 +41,7 @@ public class ClienteService {
     public List<ClienteResponse> listar() {
         return clienteRepository.findAll()
                 .stream()
+                .sorted(ORDEM_PRIORIDADE)
                 .map(ClienteResponse::new)
                 .toList();
     }
@@ -47,6 +54,7 @@ public class ClienteService {
                         termo
                 )
                 .stream()
+                .sorted(ORDEM_PRIORIDADE)
                 .map(ClienteResponse::new)
                 .toList();
     }
@@ -66,8 +74,8 @@ public class ClienteService {
         cliente.setNome(request.getNome());
         cliente.setTelefone(request.getTelefone());
         cliente.setProduto(request.getProduto());
-        cliente.setMensagem(mensagemDoRequest(request));
         cliente.setDataEnvio(request.getDataEnvio());
+        cliente.setMensagem(mensagemDoRequest(request, cliente.getDataCadastro(), request.getDataEnvio()));
 
         Cliente clienteAtualizado = clienteRepository.save(cliente);
 
@@ -87,30 +95,28 @@ public class ClienteService {
                 );
     }
 
-    private String mensagemDoRequest(ClienteRequest request) {
-        if (request.getMensagem() != null && !request.getMensagem().isBlank()) {
+    private String mensagemDoRequest(
+            ClienteRequest request,
+            LocalDate dataCadastro,
+            LocalDate dataEnvio
+    ) {
+        if (request.getMensagem() != null
+                && !request.getMensagem().isBlank()
+                && !MensagemCliente.ehMensagemAutomatica(
+                        request.getMensagem(),
+                        request.getNome(),
+                        request.getProduto(),
+                        dataCadastro,
+                        dataEnvio
+                )) {
             return request.getMensagem().trim();
         }
 
-        return mensagemPadrao(request.getNome(), request.getProduto());
-    }
-
-    private String mensagemPadrao(String nome, String produto) {
-        String nomeCliente = nome == null || nome.isBlank()
-                ? "cliente"
-                : nome.trim();
-        String nomeProduto = produto == null || produto.isBlank()
-                ? "o produto"
-                : produto.trim();
-
-        return "Ol\u00e1, " + nomeCliente + "! Tudo bem?\n\n"
-                + "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n"
-                + "Notamos que j\u00e1 faz algum tempo desde a sua \u00faltima compra de "
-                + nomeProduto
-                + ".\n\n"
-                + "Gostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. "
-                + "Caso queira, estamos \u00e0 disposi\u00e7\u00e3o para atend\u00ea-lo novamente!\n\n"
-                + "Agradecemos pela prefer\u00eancia e esperamos falar com voc\u00ea em breve.\n\n"
-                + "Equipe Agropecu\u00e1ria Nossos Bichos.";
+        return MensagemCliente.mensagemPadrao(
+                request.getNome(),
+                request.getProduto(),
+                dataCadastro,
+                dataEnvio
+        );
     }
 }

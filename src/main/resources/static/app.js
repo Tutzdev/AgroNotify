@@ -100,8 +100,12 @@ function obterDadosFormulario() {
 
 function dataPadraoEnvio() {
     const data = new Date();
-    data.setDate(data.getDate() + 7);
+    data.setDate(data.getDate() + 20);
     return formatarDataInput(data);
+}
+
+function dataCompraPadrao() {
+    return formatarDataInput(new Date());
 }
 
 function formatarDataInput(data) {
@@ -111,32 +115,125 @@ function formatarDataInput(data) {
     return `${ano}-${mes}-${dia}`;
 }
 
-function mensagemPadrao(nome, produto) {
+function criarDataLocal(valor) {
+    if (!valor) {
+        return null;
+    }
+
+    const [ano, mes, dia] = String(valor).split("-").map(Number);
+
+    if (!ano || !mes || !dia) {
+        return null;
+    }
+
+    return new Date(ano, mes - 1, dia);
+}
+
+function formatarDataBr(valor) {
+    const data = criarDataLocal(valor);
+
+    if (!data) {
+        return "";
+    }
+
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const ano = data.getFullYear();
+
+    return `${dia}/${mes}/${ano}`;
+}
+
+function calcularDiasEntre(dataCompra, dataEnvio) {
+    const compra = criarDataLocal(dataCompra);
+    const envio = criarDataLocal(dataEnvio);
+
+    if (!compra || !envio) {
+        return null;
+    }
+
+    const milissegundosDia = 24 * 60 * 60 * 1000;
+    return Math.max(0, Math.round((envio - compra) / milissegundosDia));
+}
+
+function textoDias(dias) {
+    return dias === 1 ? "1 dia" : `${dias} dias`;
+}
+
+function textoUltimaCompra(produto, dataCompra, dataEnvio) {
+    const dataCompraFormatada = formatarDataBr(dataCompra);
+    const diasDesdeCompra = calcularDiasEntre(dataCompra, dataEnvio);
+
+    if (!dataCompraFormatada || diasDesdeCompra === null) {
+        return `Notamos que j\u00e1 faz algum tempo desde a sua \u00faltima compra de ${produto}.`;
+    }
+
+    return `Notamos que j\u00e1 se passaram ${textoDias(diasDesdeCompra)} desde a sua \u00faltima compra de ${produto}, realizada em ${dataCompraFormatada}.`;
+}
+
+function mensagemPadrao(nome, produto, dataCompra = dataCompraPadrao(), dataEnvio = "") {
+    const nomeCliente = String(nome || "").trim() || "cliente";
+    const nomeProduto = String(produto || "").trim() || "o produto";
+
+    return `Ol\u00e1, ${nomeCliente}! Tudo bem?\n\nAqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n${textoUltimaCompra(nomeProduto, dataCompra, dataEnvio)}\n\nGostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. Caso queira, estamos \u00e0 disposi\u00e7\u00e3o para atend\u00ea-lo novamente!\n\nAgradecemos pela prefer\u00eancia e esperamos falar com voc\u00ea em breve.\n\nEquipe Agropecu\u00e1ria Nossos Bichos.`;
+}
+
+function mensagemPadraoAntiga(nome, produto) {
     const nomeCliente = String(nome || "").trim() || "cliente";
     const nomeProduto = String(produto || "").trim() || "o produto";
 
     return `Ol\u00e1, ${nomeCliente}! Tudo bem?\n\nAqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\nNotamos que j\u00e1 faz algum tempo desde a sua \u00faltima compra de ${nomeProduto}.\n\nGostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. Caso queira, estamos \u00e0 disposi\u00e7\u00e3o para atend\u00ea-lo novamente!\n\nAgradecemos pela prefer\u00eancia e esperamos falar com voc\u00ea em breve.\n\nEquipe Agropecu\u00e1ria Nossos Bichos.`;
 }
 
-function configurarMensagemPadrao() {
+function mensagemAutomaticaReconhecida(mensagem, nome, produto, dataCompra, dataEnvio) {
+    const texto = String(mensagem || "").trim();
+
+    return !texto
+        || texto === mensagemPadrao(nome, produto, dataCompra, dataEnvio)
+        || texto === mensagemPadraoAntiga(nome, produto);
+}
+
+function configurarMensagemPadrao(opcoes = {}) {
     const nome = document.getElementById("nome");
     const produto = document.getElementById("produto");
+    const dataEnvio = document.getElementById("dataEnvio");
     const mensagem = document.getElementById("mensagemCliente");
 
     if (!nome || !produto || !mensagem) {
         return;
     }
 
-    let mensagemAutomatica = mensagemPadrao(nome.value, produto.value);
+    const obterDataCompra = () => opcoes.dataCompra || dataCompraPadrao();
+    const gerarMensagem = () => mensagemPadrao(
+        nome.value,
+        produto.value,
+        obterDataCompra(),
+        dataEnvio ? dataEnvio.value : ""
+    );
 
-    if (!mensagem.value.trim()) {
+    let mensagemAutomatica = gerarMensagem();
+
+    if (mensagemAutomaticaReconhecida(
+            mensagem.value,
+            nome.value,
+            produto.value,
+            obterDataCompra(),
+            dataEnvio ? dataEnvio.value : ""
+        )) {
         mensagem.value = mensagemAutomatica;
     }
 
     const atualizarMensagem = () => {
-        const proximaMensagem = mensagemPadrao(nome.value, produto.value);
+        const proximaMensagem = gerarMensagem();
 
-        if (!mensagem.value.trim() || mensagem.value === mensagemAutomatica) {
+        if (!mensagem.value.trim()
+                || mensagem.value === mensagemAutomatica
+                || mensagemAutomaticaReconhecida(
+                    mensagem.value,
+                    nome.value,
+                    produto.value,
+                    obterDataCompra(),
+                    dataEnvio ? dataEnvio.value : ""
+                )) {
             mensagem.value = proximaMensagem;
         }
 
@@ -145,6 +242,7 @@ function configurarMensagemPadrao() {
 
     nome.addEventListener("input", atualizarMensagem);
     produto.addEventListener("input", atualizarMensagem);
+    dataEnvio?.addEventListener("input", atualizarMensagem);
 }
 
 function normalizarTelefone(telefone) {
@@ -159,7 +257,12 @@ function normalizarTelefone(telefone) {
 
 function gerarWhatsappLink(cliente) {
     const telefone = normalizarTelefone(cliente.telefone);
-    const mensagem = cliente.mensagem || mensagemPadrao(cliente.nome, cliente.produto);
+    const mensagem = cliente.mensagem || mensagemPadrao(
+        cliente.nome,
+        cliente.produto,
+        cliente.dataCadastro,
+        cliente.dataEnvio
+    );
 
     return `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
 }
@@ -203,9 +306,48 @@ async function carregarDashboard() {
             dados.mensagensPendentes;
         document.getElementById("mensagensEnviadas").textContent =
             dados.mensagensEnviadas;
+        exibirLembretesRecompra(dados.lembretesRecompra || []);
     } catch (erro) {
         exibirMensagem(erro.message);
     }
+}
+
+function exibirLembretesRecompra(lembretes) {
+    const lista = document.getElementById("lembretesRecompra");
+    const vazio = document.getElementById("semLembretesRecompra");
+
+    if (!lista || !vazio) {
+        return;
+    }
+
+    lista.replaceChildren();
+    vazio.hidden = lembretes.length > 0;
+
+    lembretes.forEach((cliente) => {
+        const item = document.createElement("article");
+        const info = document.createElement("div");
+        const nome = document.createElement("strong");
+        const meta = document.createElement("p");
+        const mensagem = document.createElement("p");
+        const whatsapp = document.createElement("a");
+
+        item.className = "lembrete-recompra";
+        info.className = "lembrete-info";
+        meta.className = "lembrete-meta";
+        mensagem.className = "lembrete-mensagem";
+
+        nome.textContent = cliente.nome;
+        meta.textContent = `${cliente.produto} | Recompra em ${formatarDataBr(cliente.dataEnvio) || cliente.dataEnvio}`;
+        mensagem.textContent = limitarMensagemTabela(cliente.mensagem);
+
+        configurarBotaoWhatsapp(whatsapp, cliente);
+        whatsapp.className = "botao botao-principal botao-pequeno";
+        whatsapp.textContent = "Enviar WhatsApp";
+
+        info.append(nome, meta, mensagem);
+        item.append(info, whatsapp);
+        lista.appendChild(item);
+    });
 }
 
 async function listarClientes() {
@@ -271,9 +413,13 @@ async function carregarClienteParaEdicao() {
         document.getElementById("telefone").value = cliente.telefone;
         document.getElementById("produto").value = cliente.produto;
         document.getElementById("dataEnvio").value = cliente.dataEnvio;
-        document.getElementById("mensagemCliente").value =
-            cliente.mensagem || mensagemPadrao(cliente.nome, cliente.produto);
-        configurarMensagemPadrao();
+        document.getElementById("mensagemCliente").value = cliente.mensagem || mensagemPadrao(
+            cliente.nome,
+            cliente.produto,
+            cliente.dataCadastro,
+            cliente.dataEnvio
+        );
+        configurarMensagemPadrao({ dataCompra: cliente.dataCadastro });
     } catch (erro) {
         exibirMensagem(erro.message);
     }
@@ -317,7 +463,12 @@ async function carregarDetalhesCliente() {
         preencherDetalhe("detalheDataCadastro", cliente.dataCadastro);
         preencherDetalhe("detalheDataEnvio", cliente.dataEnvio);
         preencherDetalhe("detalheStatus", cliente.statusEnvio);
-        preencherDetalhe("detalheMensagem", cliente.mensagem || mensagemPadrao(cliente.nome, cliente.produto));
+        preencherDetalhe("detalheMensagem", cliente.mensagem || mensagemPadrao(
+            cliente.nome,
+            cliente.produto,
+            cliente.dataCadastro,
+            cliente.dataEnvio
+        ));
 
         const whatsapp = document.getElementById("whatsappBtn");
         const editar = document.getElementById("editarBtn");
@@ -380,18 +531,38 @@ function adicionarCelula(linha, valor, classe = "", titulo = "") {
     linha.appendChild(celula);
 }
 
+function compararClientesPorPrioridade(clienteA, clienteB) {
+    const statusA = clienteA.statusEnvio === "PENDENTE" ? 0 : 1;
+    const statusB = clienteB.statusEnvio === "PENDENTE" ? 0 : 1;
+
+    if (statusA !== statusB) {
+        return statusA - statusB;
+    }
+
+    return String(clienteA.dataEnvio || "").localeCompare(String(clienteB.dataEnvio || ""));
+}
+
 function exibirClientes(clientes) {
     const tabela = document.getElementById("listaClientes");
     tabela.replaceChildren();
 
-    clientes.forEach((cliente) => {
+    [...clientes].sort(compararClientesPorPrioridade).forEach((cliente) => {
         const linha = document.createElement("tr");
+
+        if (cliente.statusEnvio === "PENDENTE") {
+            linha.classList.add("linha-pendente");
+        }
 
         adicionarCelula(linha, cliente.id);
         adicionarCelula(linha, cliente.nome);
         adicionarCelula(linha, cliente.telefone);
         adicionarCelula(linha, cliente.produto);
-        const mensagemCompleta = cliente.mensagem || mensagemPadrao(cliente.nome, cliente.produto);
+        const mensagemCompleta = cliente.mensagem || mensagemPadrao(
+            cliente.nome,
+            cliente.produto,
+            cliente.dataCadastro,
+            cliente.dataEnvio
+        );
 
         adicionarCelula(linha, limitarMensagemTabela(mensagemCompleta), "celula-mensagem", mensagemCompleta);
         adicionarCelula(linha, cliente.dataCadastro);
@@ -472,7 +643,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (pagina === "novo-cliente") {
         document.getElementById("dataEnvio").value = dataPadraoEnvio();
-        configurarMensagemPadrao();
+        configurarMensagemPadrao({ dataCompra: dataCompraPadrao() });
         document.getElementById("novoClienteForm").addEventListener("submit", (evento) => {
             evento.preventDefault();
             cadastrarCliente();

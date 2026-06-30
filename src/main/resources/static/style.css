@@ -157,6 +157,58 @@ a {
     font-size: 30px;
 }
 
+.painel-lembretes {
+    margin-top: 18px;
+}
+
+.cabecalho-painel {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.cabecalho-painel h2 {
+    margin-bottom: 4px;
+    font-size: 20px;
+}
+
+.lista-lembretes {
+    display: grid;
+}
+
+.lembrete-recompra {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--borda);
+}
+
+.lembrete-recompra:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.lembrete-info strong {
+    display: block;
+    color: var(--azul-escuro);
+}
+
+.lembrete-meta,
+.lembrete-mensagem {
+    margin: 2px 0 0;
+    color: var(--texto-secundario);
+}
+
+.lembrete-mensagem {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 form {
     margin: 0;
 }
@@ -299,6 +351,23 @@ tbody tr:hover {
     background: #f0f8ff;
 }
 
+tbody tr.linha-pendente {
+    background: #fffbe6;
+}
+
+tbody tr.linha-pendente:hover {
+    background: #fff6c2;
+}
+
+tbody tr.linha-pendente td:first-child {
+    border-left: 4px solid var(--amarelo);
+}
+
+tbody tr.linha-pendente td:nth-child(8) {
+    color: var(--azul-escuro);
+    font-weight: 700;
+}
+
 tbody tr:last-child td {
     border-bottom: 0;
 }
@@ -408,6 +477,14 @@ td.celula-mensagem {
     }
 
     .cards-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho-painel {
+        flex-direction: column;
+    }
+
+    .lembrete-recompra {
         grid-template-columns: 1fr;
     }
 
