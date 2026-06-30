@@ -1,4 +1,4 @@
-# AgroNotify
+# AgroPecuaria
 
 Sistema para agropecuárias gerenciarem clientes e notificações automáticas de recompra.
 
@@ -16,11 +16,12 @@ Sistema para agropecuárias gerenciarem clientes e notificações automáticas d
 
 - Login com JWT
 - Senha criptografada com BCrypt
-- CRUD de clientes
+- CRUD de clientes(ADMIN)
+- Login ADMIN
 - Busca de clientes
 - Dashboard
 - Scheduler para simular envio automático após 7 dias
-- Frontend simples para testar o sistema
+- Frontend simples para rodar o sistema
 
 ## Como rodar
 

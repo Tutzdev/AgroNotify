@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -47,11 +47,5 @@ logs/
 .DS_Store
 Thumbs.db
 
+### Playwright ###
 .playwright-cli/
-.env
-.env.*
-application-local.properties
-application-dev.properties
-application-prod.properties
-*.log
-logs/

@@ -28,10 +28,12 @@ public class SecurityConfig {
                                 "/login.html",
                                 "/dashboard.html",
                                 "/clientes.html",
+                                "/cliente-detalhes.html",
                                 "/novo-cliente.html",
                                 "/editar-cliente.html",
                                 "/style.css",
-                                "/app.js"
+                                "/app.js",
+                                "/logo-agropecuaria-nossos-bichos.jpg"
                         ).permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/clientes/**").hasRole("ADMIN")

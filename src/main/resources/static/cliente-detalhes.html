@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Cliente - AgroNotify</title>
+    <link rel="icon" type="image/jpeg" href="logo-agropecuaria-nossos-bichos.jpg">
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body data-pagina="cliente-detalhes">
+    <header class="cabecalho">
+        <div class="cabecalho-conteudo">
+            <a class="marca" href="dashboard.html" aria-label="Agropecuaria Nossos Bichos">
+                <img class="marca-logo" src="logo-agropecuaria-nossos-bichos.jpg" alt="Agropecuaria Nossos Bichos">
+            </a>
+
+            <nav class="menu" aria-label="Navegacao principal">
+                <a href="dashboard.html">Dashboard</a>
+                <a class="ativo" href="clientes.html">Clientes</a>
+                <a href="novo-cliente.html">Novo Cliente</a>
+                <button class="menu-sair" type="button" id="logoutBtn">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="conteudo">
+        <div class="titulo-pagina">
+            <div>
+                <h1>Detalhes do Cliente</h1>
+                <p>Confira os dados e envie a mensagem pelo WhatsApp.</p>
+            </div>
+        </div>
+
+        <section class="painel detalhes-painel">
+            <dl class="detalhes-lista">
+                <dt>ID</dt>
+                <dd id="detalheId"></dd>
+
+                <dt>Nome</dt>
+                <dd id="detalheNome"></dd>
+
+                <dt>Telefone</dt>
+                <dd id="detalheTelefone"></dd>
+
+                <dt>Produto</dt>
+                <dd id="detalheProduto"></dd>
+
+                <dt>Data de cadastro</dt>
+                <dd id="detalheDataCadastro"></dd>
+
+                <dt>Data de envio</dt>
+                <dd id="detalheDataEnvio"></dd>
+
+                <dt>Status</dt>
+                <dd id="detalheStatus"></dd>
+
+                <dt>Mensagem</dt>
+                <dd id="detalheMensagem" class="texto-quebra"></dd>
+            </dl>
+
+            <div class="acoes-formulario">
+                <a class="botao botao-principal" id="whatsappBtn" href="#">Enviar WhatsApp</a>
+                <a class="botao botao-secundario" id="editarBtn" href="#">Editar</a>
+                <a class="botao botao-secundario" href="clientes.html">Voltar</a>
+            </div>
+
+            <p id="mensagem" class="mensagem"></p>
+        </section>
+    </main>
+</body>
+</html>

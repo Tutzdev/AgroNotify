@@ -11,15 +11,16 @@ import java.util.List;
 
 @Service
 public class NotificacaoService {
+
     private final ClienteRepository clienteRepository;
 
-    public NotificacaoService(ClienteRepository clienteRepository) { 
+    public NotificacaoService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
 
-    public void processarNotificacoesPendentes() { 
+    public void processarNotificacoesPendentes() {
         List<Cliente> clientes = clienteRepository
-        .findByStatusEnvioAndDataEnvioLessThanEqual(StatusEnvio.PENDENTE,LocalDate.now());
+                .findByStatusEnvioAndDataEnvioLessThanEqual(StatusEnvio.PENDENTE, LocalDate.now());
 
         for (Cliente cliente : clientes) {
             enviarMensagem(cliente);
@@ -28,12 +29,15 @@ public class NotificacaoService {
         }
     }
 
-    private void enviarMensagem(Cliente cliente) { 
-        String mensagem = "Olá " + cliente.getNome()
-                + ", tudo bem? Aqui é da Agropecuária. "
-                + "Já fazem 7 dias desde a compra de "
-                + cliente.getProduto()
-                + ". Deseja repor sua ração?";
+    private void enviarMensagem(Cliente cliente) {
+        String mensagem = cliente.getMensagem();
+
+        if (mensagem == null || mensagem.isBlank()) {
+            mensagem = "Olá! Vimos que você comprou "
+                    + cliente.getProduto()
+                    + " na Agropecuária Nossos Bichos e queremos saber se você gostaria de comprar novamente. "
+                    + "Estamos à disposição para te atender.";
+        }
 
         System.out.println("Enviando para: " + cliente.getTelefone());
         System.out.println(mensagem);

@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 import java.time.LocalDate;
 
@@ -19,6 +20,8 @@ public class Cliente {
     private String nome;
     private String telefone;
     private String produto;
+    @Column(length = 1000)
+    private String mensagem;
     private LocalDate dataCadastro;
     private LocalDate dataEnvio;
 
@@ -51,6 +54,14 @@ public class Cliente {
 
     public void setProduto(String produto) {
         this.produto = produto;
+    }
+
+    public String getMensagem() {
+        return mensagem;
+    }
+
+    public void setMensagem(String mensagem) {
+        this.mensagem = mensagem;
     }
 
     public LocalDate getDataCadastro() {

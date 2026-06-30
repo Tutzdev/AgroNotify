@@ -1,13 +1,15 @@
 :root {
-    --verde: #2f6b3b;
-    --verde-escuro: #24542e;
-    --verde-claro: #e8f1e9;
-    --fundo: #f4f7f3;
+    --azul: #1f8ed8;
+    --azul-escuro: #135a9c;
+    --azul-claro: #e7f4ff;
+    --amarelo: #ffe81f;
+    --amarelo-claro: #fff8c9;
+    --fundo: #f5f9ff;
     --branco: #ffffff;
-    --texto: #243028;
-    --texto-secundario: #657168;
-    --borda: #d8e0d8;
-    --cinza-claro: #f0f3f0;
+    --texto: #1b3145;
+    --texto-secundario: #617487;
+    --borda: #c9dcea;
+    --cinza-claro: #f2f7fb;
     --vermelho: #a63d3d;
 }
 
@@ -57,22 +59,18 @@ a {
 }
 
 .marca {
-    color: var(--verde-escuro);
+    color: var(--azul-escuro);
     font-size: 20px;
     font-weight: 700;
     text-decoration: none;
 }
 
-.marca-simbolo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
+.marca-logo {
+    display: block;
+    width: 52px;
+    height: 52px;
     border-radius: 6px;
-    background: var(--verde);
-    color: var(--branco);
-    font-weight: 700;
+    object-fit: cover;
 }
 
 .menu {
@@ -96,8 +94,8 @@ a {
 .menu a:hover,
 .menu-sair:hover,
 .menu a.ativo {
-    background: var(--verde-claro);
-    color: var(--verde-escuro);
+    background: var(--amarelo-claro);
+    color: var(--azul-escuro);
 }
 
 .conteudo {
@@ -145,7 +143,7 @@ a {
 
 .card-resumo {
     padding: 22px;
-    border-top: 4px solid var(--verde);
+    border-top: 4px solid var(--amarelo);
 }
 
 .card-resumo span {
@@ -155,7 +153,7 @@ a {
 }
 
 .card-resumo strong {
-    color: var(--verde-escuro);
+    color: var(--azul-escuro);
     font-size: 30px;
 }
 
@@ -177,11 +175,12 @@ label {
     font-weight: 600;
 }
 
-input {
+input,
+textarea {
     width: 100%;
     min-height: 42px;
     padding: 9px 11px;
-    border: 1px solid #bfc9c0;
+    border: 1px solid #b8cfe2;
     border-radius: 5px;
     outline: none;
     background: var(--branco);
@@ -189,9 +188,15 @@ input {
     font: inherit;
 }
 
-input:focus {
-    border-color: var(--verde);
-    box-shadow: 0 0 0 3px rgba(47, 107, 59, 0.12);
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(31, 142, 216, 0.14);
 }
 
 .botao {
@@ -209,22 +214,22 @@ input:focus {
 }
 
 .botao-principal {
-    background: var(--verde);
+    background: var(--azul);
     color: var(--branco);
 }
 
 .botao-principal:hover {
-    background: var(--verde-escuro);
+    background: var(--azul-escuro);
 }
 
 .botao-secundario {
     border-color: var(--borda);
-    background: var(--cinza-claro);
-    color: var(--texto);
+    background: var(--amarelo-claro);
+    color: var(--azul-escuro);
 }
 
 .botao-secundario:hover {
-    background: #e4e9e4;
+    background: #fff2a0;
 }
 
 .botao-perigo {
@@ -285,13 +290,13 @@ td {
 }
 
 th {
-    background: var(--verde-claro);
-    color: var(--verde-escuro);
+    background: var(--azul-claro);
+    color: var(--azul-escuro);
     font-size: 13px;
 }
 
 tbody tr:hover {
-    background: #fafcfa;
+    background: #f0f8ff;
 }
 
 tbody tr:last-child td {
@@ -300,6 +305,38 @@ tbody tr:last-child td {
 
 td .botao {
     margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+td.celula-mensagem {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detalhes-painel {
+    max-width: 760px;
+}
+
+.detalhes-lista {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 12px 18px;
+    margin: 0 0 22px;
+}
+
+.detalhes-lista dt {
+    color: var(--texto-secundario);
+    font-weight: 700;
+}
+
+.detalhes-lista dd {
+    margin: 0;
+}
+
+.texto-quebra {
+    white-space: pre-wrap;
 }
 
 .mensagem {
@@ -330,8 +367,13 @@ td .botao {
 
 .login-marca h1 {
     margin: 0;
-    color: var(--verde-escuro);
+    color: var(--azul-escuro);
     font-size: 26px;
+}
+
+.login-marca .marca-logo {
+    width: 92px;
+    height: 92px;
 }
 
 .login-card .texto-secundario {
@@ -401,5 +443,9 @@ td .botao {
     .acoes-formulario {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .detalhes-lista {
+        grid-template-columns: 1fr;
     }
 }

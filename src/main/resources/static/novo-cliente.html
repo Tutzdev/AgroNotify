@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novo Cliente - AgroNotify</title>
+    <link rel="icon" type="image/jpeg" href="logo-agropecuaria-nossos-bichos.jpg">
     <link rel="stylesheet" href="style.css">
     <script src="app.js" defer></script>
 </head>
 <body data-pagina="novo-cliente">
     <header class="cabecalho">
         <div class="cabecalho-conteudo">
-            <a class="marca" href="dashboard.html">
-                <span class="marca-simbolo">A</span>
-                <span>AgroNotify</span>
+            <a class="marca" href="dashboard.html" aria-label="Agropecuaria Nossos Bichos">
+                <img class="marca-logo" src="logo-agropecuaria-nossos-bichos.jpg" alt="Agropecuaria Nossos Bichos">
             </a>
 
             <nav class="menu" aria-label="Navegação principal">
@@ -47,6 +47,16 @@
                 <div class="campo">
                     <label for="produto">Produto</label>
                     <input type="text" id="produto" name="produto" required>
+                </div>
+
+                <div class="campo">
+                    <label for="dataEnvio">Data de envio</label>
+                    <input type="date" id="dataEnvio" name="dataEnvio" required>
+                </div>
+
+                <div class="campo">
+                    <label for="mensagemCliente">Mensagem</label>
+                    <textarea id="mensagemCliente" name="mensagemCliente" rows="5" required></textarea>
                 </div>
 
                 <div class="acoes-formulario">
