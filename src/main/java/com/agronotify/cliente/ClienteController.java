@@ -52,6 +52,13 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.atualizar(id, request));
     }
 
+    @PatchMapping("/{id}/enviar")
+    public ResponseEntity<ClienteResponse> marcarComoEnviado(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(clienteService.marcarComoEnviado(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         clienteService.deletar(id);

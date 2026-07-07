@@ -48,7 +48,7 @@ final class MensagemCliente {
                 : produto.trim();
 
         return "Ol\u00e1, " + nomeCliente + "! Tudo bem?\n\n"
-                + "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n"
+                + "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos.\n\n"
                 + textoUltimaCompra(nomeProduto, dataCompra, dataEnvio)
                 + "\n\n"
                 + "Gostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. "
@@ -71,7 +71,21 @@ final class MensagemCliente {
         String mensagemNormalizada = mensagem.trim();
 
         return mensagemNormalizada.equals(mensagemPadrao(nome, produto, dataCompra, dataEnvio))
+                || mensagemNormalizada.equals(mensagemPadraoComEmoji(nome, produto, dataCompra, dataEnvio))
                 || mensagemNormalizada.equals(mensagemPadraoAntiga(nome, produto));
+    }
+
+    private static String mensagemPadraoComEmoji(
+            String nome,
+            String produto,
+            LocalDate dataCompra,
+            LocalDate dataEnvio
+    ) {
+        return mensagemPadrao(nome, produto, dataCompra, dataEnvio)
+                .replace(
+                        "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos.\n\n",
+                        "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n"
+                );
     }
 
     private static String textoUltimaCompra(

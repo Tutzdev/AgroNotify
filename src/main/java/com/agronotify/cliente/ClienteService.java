@@ -82,6 +82,16 @@ public class ClienteService {
         return new ClienteResponse(clienteAtualizado);
     }
 
+    public ClienteResponse marcarComoEnviado(Long id) {
+        Cliente cliente = buscarEntidade(id);
+
+        cliente.setStatusEnvio(StatusEnvio.ENVIADO);
+
+        Cliente clienteAtualizado = clienteRepository.save(cliente);
+
+        return new ClienteResponse(clienteAtualizado);
+    }
+
     public void deletar(Long id) {
         Cliente cliente = buscarEntidade(id);
 

@@ -174,7 +174,12 @@ function mensagemPadrao(nome, produto, dataCompra = dataCompraPadrao(), dataEnvi
     const nomeCliente = String(nome || "").trim() || "cliente";
     const nomeProduto = String(produto || "").trim() || "o produto";
 
-    return `Ol\u00e1, ${nomeCliente}! Tudo bem?\n\nAqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n${textoUltimaCompra(nomeProduto, dataCompra, dataEnvio)}\n\nGostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. Caso queira, estamos \u00e0 disposi\u00e7\u00e3o para atend\u00ea-lo novamente!\n\nAgradecemos pela prefer\u00eancia e esperamos falar com voc\u00ea em breve.\n\nEquipe Agropecu\u00e1ria Nossos Bichos.`;
+    return `Ol\u00e1, ${nomeCliente}! Tudo bem?\n\nAqui \u00e9 da Agropecu\u00e1ria Nossos Bichos.\n\n${textoUltimaCompra(nomeProduto, dataCompra, dataEnvio)}\n\nGostar\u00edamos de saber se seu pet j\u00e1 est\u00e1 precisando de uma nova reposi\u00e7\u00e3o. Caso queira, estamos \u00e0 disposi\u00e7\u00e3o para atend\u00ea-lo novamente!\n\nAgradecemos pela prefer\u00eancia e esperamos falar com voc\u00ea em breve.\n\nEquipe Agropecu\u00e1ria Nossos Bichos.`;
+}
+
+function mensagemPadraoComEmoji(nome, produto, dataCompra = dataCompraPadrao(), dataEnvio = "") {
+    return mensagemPadrao(nome, produto, dataCompra, dataEnvio)
+        .replace("Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos.\n\n", "Aqui \u00e9 da Agropecu\u00e1ria Nossos Bichos. \uD83D\uDE0A\n\n");
 }
 
 function mensagemPadraoAntiga(nome, produto) {
@@ -189,6 +194,7 @@ function mensagemAutomaticaReconhecida(mensagem, nome, produto, dataCompra, data
 
     return !texto
         || texto === mensagemPadrao(nome, produto, dataCompra, dataEnvio)
+        || texto === mensagemPadraoComEmoji(nome, produto, dataCompra, dataEnvio)
         || texto === mensagemPadraoAntiga(nome, produto);
 }
 
@@ -271,10 +277,28 @@ function obterWhatsappLink(cliente) {
     return cliente.whatsappLink || gerarWhatsappLink(cliente);
 }
 
-function configurarBotaoWhatsapp(botao, cliente) {
+async function marcarClienteComoEnviado(id) {
+    return apiFetch(`/clientes/${encodeURIComponent(id)}/enviar`, {
+        method: "PATCH"
+    });
+}
+
+function configurarBotaoWhatsapp(botao, cliente, aoEnviar = null) {
     botao.href = obterWhatsappLink(cliente);
     botao.target = "_blank";
     botao.rel = "noopener noreferrer";
+
+    botao.addEventListener("click", () => {
+        marcarClienteComoEnviado(cliente.id)
+            .then((clienteAtualizado) => {
+                cliente.statusEnvio = clienteAtualizado.statusEnvio;
+
+                if (aoEnviar) {
+                    aoEnviar(clienteAtualizado);
+                }
+            })
+            .catch((erro) => exibirMensagem(erro.message));
+    });
 }
 
 async function login() {
@@ -340,7 +364,7 @@ function exibirLembretesRecompra(lembretes) {
         meta.textContent = `${cliente.produto} | Recompra em ${formatarDataBr(cliente.dataEnvio) || cliente.dataEnvio}`;
         mensagem.textContent = limitarMensagemTabela(cliente.mensagem);
 
-        configurarBotaoWhatsapp(whatsapp, cliente);
+        configurarBotaoWhatsapp(whatsapp, cliente, carregarDashboard);
         whatsapp.className = "botao botao-principal botao-pequeno";
         whatsapp.textContent = "Enviar WhatsApp";
 
@@ -473,7 +497,10 @@ async function carregarDetalhesCliente() {
         const whatsapp = document.getElementById("whatsappBtn");
         const editar = document.getElementById("editarBtn");
 
-        configurarBotaoWhatsapp(whatsapp, cliente);
+        configurarBotaoWhatsapp(whatsapp, cliente, (clienteAtualizado) => {
+            preencherDetalhe("detalheStatus", clienteAtualizado.statusEnvio);
+            exibirMensagem("Mensagem marcada como enviada.");
+        });
         editar.href = `editar-cliente.html?id=${encodeURIComponent(cliente.id)}`;
         exibirMensagem("");
     } catch (erro) {
@@ -575,7 +602,7 @@ function exibirClientes(clientes) {
         const editar = document.createElement("a");
         const deletar = document.createElement("button");
 
-        configurarBotaoWhatsapp(whatsapp, cliente);
+        configurarBotaoWhatsapp(whatsapp, cliente, listarClientes);
         whatsapp.className = "botao botao-principal botao-pequeno";
         whatsapp.textContent = "Enviar WhatsApp";
 
