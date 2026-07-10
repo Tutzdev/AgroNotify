@@ -34,13 +34,21 @@ function obterEmailToken() {
 function obterMarcaPorEmail(emailInformado) {
     const email = String(emailInformado || "").toLowerCase();
 
-    if (email.includes("petsotre")) return MARCAS.petstore;
-    if (email.includes("luci")) return MARCAS.luci;
-    return MARCAS.agro;
+    if (email === "admin@agro.com") return MARCAS.agro;
+    if (email === "admin@petstore.com") return MARCAS.petstore;
+    if (email === "admin@luci.com") return MARCAS.luci;
+    return null;
 }
 
 function aplicarMarca(emailInformado = obterEmailToken()) {
     const marca = obterMarcaPorEmail(emailInformado);
+
+    document.body.classList.remove("marca-agro", "marca-petstore", "marca-luci");
+
+    if (!marca) {
+        return;
+    }
+
     document.body.classList.add(marca.classe);
     document.title = `${marca.nome} - AgroNotify`;
 
@@ -87,6 +95,7 @@ function verificarAutenticacao() {
 
 function logout() {
     localStorage.removeItem(TOKEN_KEY);
+    aplicarMarca("");
     redirecionarParaLogin();
 }
 
@@ -115,6 +124,7 @@ async function apiFetch(url, options = {}, exigeToken = true) {
 
     if (response.status === 401 && exigeToken) {
         localStorage.removeItem(TOKEN_KEY);
+        aplicarMarca("");
         redirecionarParaLogin();
         throw new Error("Sessao expirada.");
     }
@@ -382,6 +392,7 @@ async function login() {
         }, false);
 
         localStorage.setItem(TOKEN_KEY, resposta.token);
+        aplicarMarca(email);
         window.location.href = "dashboard.html";
     } catch (erro) {
         exibirMensagem(erro.message);
@@ -702,10 +713,11 @@ function configurarLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    aplicarMarca();
     const pagina = document.body.dataset.pagina;
 
     if (pagina === "login") {
+        // A tela de login nunca herda a marca da sessão anterior.
+        aplicarMarca("");
         document.getElementById("email").addEventListener("input", (evento) => {
             aplicarMarca(evento.target.value);
         });
@@ -715,6 +727,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         return;
     }
+
+    aplicarMarca();
 
     if (!verificarAutenticacao()) {
         return;
