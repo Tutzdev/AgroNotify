@@ -1,5 +1,7 @@
 package com.agronotify.cliente;
 
+import com.agronotify.auth.Usuario;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -19,7 +21,7 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
-    public ClienteResponse criar(ClienteRequest request) {
+    public ClienteResponse criar(ClienteRequest request, Usuario usuario) {
 
         Cliente cliente = new Cliente();
 
@@ -32,26 +34,25 @@ public class ClienteService {
         cliente.setDataEnvio(request.getDataEnvio());
         cliente.setMensagem(mensagemDoRequest(request, dataCadastro, request.getDataEnvio()));
         cliente.setStatusEnvio(StatusEnvio.PENDENTE);
+        cliente.setUsuario(usuario);
 
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
         return new ClienteResponse(clienteSalvo);
     }
 
-    public List<ClienteResponse> listar() {
-        return clienteRepository.findAll()
+    public List<ClienteResponse> listar(Usuario usuario) {
+        return clienteRepository.findByUsuario(usuario)
                 .stream()
                 .sorted(ORDEM_PRIORIDADE)
                 .map(ClienteResponse::new)
                 .toList();
     }
 
-    public List<ClienteResponse> buscarPorTermo(String termo) {
+    public List<ClienteResponse> buscarPorTermo(String termo, Usuario usuario) {
         return clienteRepository
-                .findByNomeContainingIgnoreCaseOrTelefoneContainingIgnoreCaseOrProdutoContainingIgnoreCase(
-                        termo,
-                        termo,
-                        termo
+                .findByUsuarioAndNomeContainingIgnoreCaseOrUsuarioAndTelefoneContainingIgnoreCaseOrUsuarioAndProdutoContainingIgnoreCase(
+                        usuario, termo, usuario, termo, usuario, termo
                 )
                 .stream()
                 .sorted(ORDEM_PRIORIDADE)
@@ -59,17 +60,18 @@ public class ClienteService {
                 .toList();
     }
 
-    public ClienteResponse buscar(Long id) {
-        Cliente cliente = buscarEntidade(id);
+    public ClienteResponse buscar(Long id, Usuario usuario) {
+        Cliente cliente = buscarEntidade(id, usuario);
 
         return new ClienteResponse(cliente);
     }
 
     public ClienteResponse atualizar(
             Long id,
-            ClienteRequest request
+            ClienteRequest request,
+            Usuario usuario
     ) {
-        Cliente cliente = buscarEntidade(id);
+        Cliente cliente = buscarEntidade(id, usuario);
 
         cliente.setNome(request.getNome());
         cliente.setTelefone(request.getTelefone());
@@ -82,8 +84,8 @@ public class ClienteService {
         return new ClienteResponse(clienteAtualizado);
     }
 
-    public ClienteResponse marcarComoEnviado(Long id) {
-        Cliente cliente = buscarEntidade(id);
+    public ClienteResponse marcarComoEnviado(Long id, Usuario usuario) {
+        Cliente cliente = buscarEntidade(id, usuario);
 
         cliente.setStatusEnvio(StatusEnvio.ENVIADO);
 
@@ -92,14 +94,16 @@ public class ClienteService {
         return new ClienteResponse(clienteAtualizado);
     }
 
-    public void deletar(Long id) {
-        Cliente cliente = buscarEntidade(id);
+    public void deletar(Long id, Usuario usuario) {
+        Cliente cliente = buscarEntidade(id, usuario);
 
         clienteRepository.delete(cliente);
     }
 
-    private Cliente buscarEntidade(Long id) {
+    private Cliente buscarEntidade(Long id, Usuario usuario) {
         return clienteRepository.findById(id)
+                .filter(cliente -> cliente.getUsuario() != null
+                        && usuario.getId().equals(cliente.getUsuario().getId()))
                 .orElseThrow(
                         () -> new ClienteNaoEncontradoException(id)
                 );

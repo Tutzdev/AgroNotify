@@ -1,5 +1,73 @@
 const TOKEN_KEY = "agroNotifyToken";
 
+const MARCAS = {
+    agro: {
+        nome: "Agropecuária Nossos Bichos",
+        logo: "logo-agropecuaria-nossos-bichos.jpg",
+        classe: "marca-agro"
+    },
+    petstore: {
+        nome: "Pet Store Volta Redonda",
+        logo: "petstore.jpeg",
+        classe: "marca-petstore"
+    },
+    luci: {
+        nome: "AgroLuci",
+        logo: "image.png",
+        classe: "marca-luci"
+    }
+};
+
+function obterEmailToken() {
+    const token = obterToken();
+
+    if (!token) return "";
+
+    try {
+        const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(payload)).sub || "";
+    } catch (erro) {
+        return "";
+    }
+}
+
+function obterMarcaPorEmail(emailInformado) {
+    const email = String(emailInformado || "").toLowerCase();
+
+    if (email.includes("petsotre")) return MARCAS.petstore;
+    if (email.includes("luci")) return MARCAS.luci;
+    return MARCAS.agro;
+}
+
+function aplicarMarca(emailInformado = obterEmailToken()) {
+    const marca = obterMarcaPorEmail(emailInformado);
+    document.body.classList.add(marca.classe);
+    document.title = `${marca.nome} - AgroNotify`;
+
+    document.querySelectorAll(".marca-logo").forEach((logo) => {
+        logo.src = marca.logo;
+        logo.alt = marca.nome;
+    });
+
+    document.querySelectorAll(".marca").forEach((elemento) => {
+        elemento.setAttribute("aria-label", marca.nome);
+        if (!elemento.querySelector(".marca-nome")) {
+            const nome = document.createElement("span");
+            nome.className = "marca-nome";
+            nome.textContent = marca.nome;
+            elemento.appendChild(nome);
+        }
+    });
+
+    const marcaLogin = document.querySelector(".login-marca");
+    if (marcaLogin && !marcaLogin.querySelector(".marca-nome")) {
+        const nome = document.createElement("h1");
+        nome.className = "marca-nome";
+        nome.textContent = marca.nome;
+        marcaLogin.appendChild(nome);
+    }
+}
+
 function obterToken() {
     return localStorage.getItem(TOKEN_KEY);
 }
@@ -634,9 +702,13 @@ function configurarLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    aplicarMarca();
     const pagina = document.body.dataset.pagina;
 
     if (pagina === "login") {
+        document.getElementById("email").addEventListener("input", (evento) => {
+            aplicarMarca(evento.target.value);
+        });
         document.getElementById("loginForm").addEventListener("submit", (evento) => {
             evento.preventDefault();
             login();

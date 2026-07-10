@@ -1,11 +1,24 @@
 package com.agronotify.cliente;
 
+import com.agronotify.auth.Usuario;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+
+    List<Cliente> findByUsuario(Usuario usuario);
+
+    List<Cliente> findTop5ByUsuarioAndStatusEnvioAndDataEnvioLessThanEqualOrderByDataEnvioAsc(
+            Usuario usuario, StatusEnvio statusEnvio, LocalDate dataEnvio);
+
+    List<Cliente> findByUsuarioAndNomeContainingIgnoreCaseOrUsuarioAndTelefoneContainingIgnoreCaseOrUsuarioAndProdutoContainingIgnoreCase(
+            Usuario usuarioNome, String nome, Usuario usuarioTelefone, String telefone,
+            Usuario usuarioProduto, String produto);
+
+    long countByUsuarioAndStatusEnvio(Usuario usuario, StatusEnvio statusEnvio);
 
     List<Cliente> findByStatusEnvioAndDataEnvioLessThanEqual(
             StatusEnvio statusEnvio,

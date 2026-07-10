@@ -449,6 +449,53 @@ td.celula-mensagem {
     margin-bottom: 24px;
 }
 
+body.marca-agro {
+    --azul: #1674c5;
+    --azul-escuro: #07549a;
+    --azul-claro: #eaf4ff;
+    --amarelo: #f4c51d;
+    --amarelo-claro: #fff8d7;
+    --fundo: #f5f9ff;
+    --borda: #c8ddec;
+}
+
+body.marca-petstore {
+    --azul: #1768c2;
+    --azul-escuro: #104787;
+    --azul-claro: #e9f2ff;
+    --amarelo: #ffd21a;
+    --amarelo-claro: #fff8d8;
+    --fundo: #fffaf2;
+    --borda: #d5dce7;
+}
+
+body.marca-luci {
+    --azul: #758a43;
+    --azul-escuro: #3c4a2a;
+    --azul-claro: #eef3e7;
+    --amarelo: #b18b49;
+    --amarelo-claro: #f8f0df;
+    --fundo: #fbf7f0;
+    --borda: #d8d3c1;
+}
+
+.marca-nome {
+    color: var(--azul-escuro);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.login-marca .marca-nome {
+    margin: 0;
+    font-size: 24px;
+}
+
+body.marca-petstore .marca-logo,
+body.marca-luci .marca-logo {
+    object-fit: contain;
+    background: var(--branco);
+}
+
 @media (max-width: 760px) {
     .cabecalho-conteudo {
         align-items: flex-start;

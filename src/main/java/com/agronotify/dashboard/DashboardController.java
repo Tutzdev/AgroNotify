@@ -1,6 +1,8 @@
 package com.agronotify.dashboard;
 
+import com.agronotify.auth.Usuario;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,9 +16,9 @@ public class DashboardController {
     }
 
     @GetMapping
-    public ResponseEntity<DashboardResponse> buscarDados() {
+    public ResponseEntity<DashboardResponse> buscarDados(@AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(
-                dashboardService.buscarDados()
+                dashboardService.buscarDados(usuario)
         );
     }
 }

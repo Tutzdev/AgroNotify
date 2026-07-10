@@ -1,5 +1,6 @@
 package com.agronotify.dashboard;
 
+import com.agronotify.auth.Usuario;
 import com.agronotify.cliente.ClienteRepository;
 import com.agronotify.cliente.ClienteResponse;
 import com.agronotify.cliente.StatusEnvio;
@@ -17,17 +18,17 @@ public class DashboardService {
         this.clienteRepository = clienteRepository;
     }
 
-    public DashboardResponse buscarDados() {
+    public DashboardResponse buscarDados(Usuario usuario) {
 
-        long totalClientes = clienteRepository.count();
+        long totalClientes = clienteRepository.findByUsuario(usuario).size();
 
-        long mensagensPendentes = clienteRepository.countByStatusEnvio(StatusEnvio.PENDENTE);
+        long mensagensPendentes = clienteRepository.countByUsuarioAndStatusEnvio(usuario, StatusEnvio.PENDENTE);
 
-        long mensagensEnviadas = clienteRepository.countByStatusEnvio(StatusEnvio.ENVIADO);
+        long mensagensEnviadas = clienteRepository.countByUsuarioAndStatusEnvio(usuario, StatusEnvio.ENVIADO);
 
         List<ClienteResponse> lembretesRecompra = clienteRepository
-                .findTop5ByStatusEnvioAndDataEnvioLessThanEqualOrderByDataEnvioAsc(
-                        StatusEnvio.PENDENTE,
+                .findTop5ByUsuarioAndStatusEnvioAndDataEnvioLessThanEqualOrderByDataEnvioAsc(
+                        usuario, StatusEnvio.PENDENTE,
                         LocalDate.now()
                 )
                 .stream()

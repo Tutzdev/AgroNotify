@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+  <rect width="640" height="640" rx="36" fill="#fbf7f0"/>
+  <circle cx="320" cy="264" r="205" fill="none" stroke="#64743a" stroke-width="12"/>
+  <path d="M185 314c40-80 89-122 135-120 45 2 90 45 135 120M194 315c-22 64-12 100 28 110M446 315c22 64 12 100-28 110" fill="none" stroke="#64743a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M260 227q30-70 60 0M320 227q30-70 60 0" fill="none" stroke="#a17c3d" stroke-width="9"/>
+  <path d="M178 420q-42 28-60 72M462 420q42 28 60 72M198 446q-40 4-65-18M442 446q40 4 65-18" fill="none" stroke="#64743a" stroke-width="10" stroke-linecap="round"/>
+  <text x="320" y="550" text-anchor="middle" font-family="Georgia,serif" font-size="64" font-weight="700" fill="#3c4a2a">AgroLuci</text>
+</svg>

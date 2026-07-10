@@ -33,7 +33,11 @@ public class SecurityConfig {
                                 "/editar-cliente.html",
                                 "/style.css",
                                 "/app.js",
-                                "/logo-agropecuaria-nossos-bichos.jpg"
+                                "/logo-agropecuaria-nossos-bichos.jpg",
+                                "/image.png",
+                                "/petstore.jpeg",
+                                "/logo-petstore.svg",
+                                "/logo-agroluci.svg"
                         ).permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/clientes/**").hasRole("ADMIN")
