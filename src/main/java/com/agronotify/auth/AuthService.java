@@ -24,34 +24,11 @@ public class AuthService {
 
         Usuario usuario = usuarioRepository
                 .findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new RuntimeException("Usuário não encontrado"));
-
-        if (!passwordEncoder.matches(
-                request.getSenha(),
-                usuario.getSenha()
-        )) {
-            throw new RuntimeException("Senha inválida");
-        }
+                .filter(encontrado -> passwordEncoder.matches(request.getSenha(), encontrado.getSenha()))
+                .orElseThrow(CredenciaisInvalidasException::new);
 
         String token = jwtService.gerarToken(usuario);
 
         return new LoginResponse(token);
-    }
-
-    public void register(RegisterRequest request) {
-
-        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email já cadastrado");
-        }
-
-        Usuario usuario = new Usuario();
-
-        usuario.setNome(request.getNome());
-        usuario.setEmail(request.getEmail());
-        usuario.setSenha(passwordEncoder.encode(request.getSenha()));
-        usuario.setRole("ADMIN");
-
-        usuarioRepository.save(usuario);
     }
 }

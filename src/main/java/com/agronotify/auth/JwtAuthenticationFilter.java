@@ -42,10 +42,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authorizationHeader.replace("Bearer ", "");
-        String email = jwtService.validarToken(token);
+        String token = authorizationHeader.substring("Bearer ".length());
 
-        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+        Usuario usuario = jwtService.validarToken(token)
+                .flatMap(usuarioRepository::findByEmail)
+                .orElse(null);
 
         if (usuario == null) {
             filterChain.doFilter(request, response);

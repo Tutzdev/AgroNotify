@@ -1,5 +1,6 @@
 package com.agronotify.common;
 
+import com.agronotify.auth.CredenciaisInvalidasException;
 import com.agronotify.cliente.ClienteNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,16 @@ public class GlobalExceptionHandler {
     ) {
         return Map.of(
                 "erro", exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> credenciaisInvalidas(
+            CredenciaisInvalidasException exception
+    ) {
+        return Map.of(
+                "message", exception.getMessage()
         );
     }
 

@@ -22,13 +22,4 @@ public class AuthController {
                 authService.login(request)
         );
     }
-
-    @PostMapping("/register")
-    public ResponseEntity<Void> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
-        authService.register(request);
-
-        return ResponseEntity.noContent().build();
-    }
 }
