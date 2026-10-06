@@ -1,101 +1,112 @@
 # AgroNotify
 
-**Sistema de recompra para agropecuárias e pet shops:** registra o que cada cliente comprou, calcula quando ele vai precisar de novo e deixa a mensagem de WhatsApp pronta no dia certo.
+**Backend Spring Boot de recompra para agropecuárias e pet shops:** registra o que cada cliente comprou, calcula quando ele vai precisar de novo e deixa a mensagem de WhatsApp pronta no dia certo, com os dados de cada loja isolados.
 
 [![CI](https://github.com/Tutzdev/AgroNotify/actions/workflows/ci.yml/badge.svg)](https://github.com/Tutzdev/AgroNotify/actions/workflows/ci.yml)
 ![Java 21](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)
 ![Spring Boot 3.5](https://img.shields.io/badge/Spring_Boot-3.5-6DB33F?logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-JWT-6DB33F?logo=springsecurity&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
-![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)
+![JUnit 5](https://img.shields.io/badge/JUnit-5-25A162?logo=junit5&logoColor=white)
 
-> **Projeto freelance real.** Desenvolvido sob demanda para uma agropecuária e implantado em VPS. Hoje atende três lojas do ramo agropet, cada uma com seus próprios clientes, isolados.
-
-![Dashboard com os lembretes de recompra do dia](docs/screenshots/dashboard.png)
+> **Projeto freelance real.** Desenvolvido sob demanda para uma agropecuária e implantado em VPS. Hoje atende três lojas do ramo agropet, cada uma com os próprios clientes.
 
 ## O problema
 
 Ração, vermífugo, antipulgas e sal mineral são comprados de tempos em tempos. Quando o cliente esquece de voltar, a venda vai para o concorrente. Os donos das lojas faziam esse controle de cabeça ou em caderno.
 
-## A solução
+## Destaques de backend
+
+- **Multi-tenant no service:** toda consulta e alteração filtra pelo usuário autenticado. Um ID de outra loja responde **404**, sem revelar que o registro existe.
+- **Autenticação stateless com JWT:** filtro próprio no Spring Security, HMAC-256 e expiração configurável. A aplicação **não sobe** com segredo menor que 32 bytes.
+- **Login sem enumeração de usuários:** a mesma mensagem genérica para e-mail inexistente e senha errada.
+- **Regra de mensagem centralizada:** `MensagemCliente` monta o texto com nome, produto, data da última compra e dias passados. Ela regenera a mensagem quando os dados mudam e preserva o texto escrito à mão.
+- **Rotina agendada:** `@Scheduled(cron = "0 0 9 * * *")` processa os lembretes pendentes que venceram.
+- **Segredos só por ambiente:** banco, JWT e senha inicial nunca ficam no código. Veja [`.env.example`](.env.example).
+
+## Fluxo
 
 1. No balcão, o atendente cadastra o cliente, o produto e **quando ele deve precisar de novo**.
-2. O sistema gera uma mensagem personalizada, com nome, produto, data da compra e dias passados.
-3. Na data certa o cliente aparece no **dashboard**, e um clique abre o WhatsApp com a mensagem pronta.
+2. A API gera a mensagem personalizada.
+3. Na data certa o cliente aparece no dashboard, priorizando os pendentes mais antigos. Um clique abre o WhatsApp (`wa.me`) com o texto pronto.
 4. Depois do envio o lembrete é marcado como **enviado** e sai da fila.
-
-## Funcionalidades
-
-- **Multi-loja (multi-tenant):** cada administrador vê só os próprios clientes. O isolamento é aplicado no service, não só na tela.
-- **Dashboard** com total de clientes, mensagens pendentes e enviadas, além dos 5 lembretes mais urgentes.
-- **CRUD de clientes** com busca por nome, telefone ou produto, priorizando os pendentes mais antigos.
-- **Mensagem automática:** é regenerada se os dados mudam, mas uma mensagem escrita à mão é preservada.
-- **Envio pelo WhatsApp** via link `wa.me` com o texto preenchido, e marcação de enviado pela API.
-- **Rotina agendada** (`@Scheduled`, todo dia às 9h) que processa os lembretes vencidos.
-- **Identidade visual por loja:** logo e cores mudam conforme quem está logado.
-
-| Login | Clientes | Novo cliente |
-| --- | --- | --- |
-| ![Login](docs/screenshots/login.png) | ![Clientes](docs/screenshots/clientes.png) | ![Novo cliente](docs/screenshots/novo-cliente.png) |
 
 ## Arquitetura
 
-Monólito Spring Boot que serve a API REST e o frontend estático (HTML, CSS e JavaScript puro) no mesmo processo. Isso dá um único deploy na VPS e nenhuma configuração de CORS.
+Monólito Spring Boot organizado por funcionalidade, que serve a API REST e um frontend estático no mesmo processo: um único deploy na VPS e nenhuma configuração de CORS.
 
 ```mermaid
 flowchart LR
-    U[Atendente] -->|HTML/JS| F[Frontend estático]
-    F -->|REST + JWT| C[Controllers]
-    C --> S[Services]
+    U[Cliente HTTP] -->|Bearer JWT| JF[JwtAuthenticationFilter]
+    JF --> SC[Spring Security<br/>papel ADMIN]
+    SC --> C[Controllers]
+    C --> S[Services<br/>isolamento por loja]
+    S --> MC[MensagemCliente<br/>regra da mensagem]
     S --> R[Spring Data JPA]
     R --> DB[(PostgreSQL)]
-    SCH[Scheduler 9h] --> N[NotificacaoService]
+    SCH["@Scheduled 9h"] --> N[NotificacaoService]
     N --> R
-    F -->|wa.me| W[WhatsApp]
 ```
 
 ```text
 src/main/java/com/agronotify
-├── auth/          # login, JWT, filtro de segurança, seed dos administradores
-├── cliente/       # entidade, regras de prioridade, mensagem automática, CRUD
+├── auth/          # login, emissão e validação de JWT, filtro, BCrypt, seed dos administradores
+├── cliente/       # entidade, mensagem automática, busca e CRUD isolado por loja
 ├── dashboard/     # métricas e lembretes do dia por loja
 ├── notificacao/   # rotina agendada de lembretes
 └── common/        # tratamento global de erros
 ```
 
+### API
+
+| Recurso | Rotas |
+| --- | --- |
+| Autenticação | `POST /auth/login` → token JWT |
+| Clientes | `GET /clientes` · `GET /clientes/buscar?termo=` (nome, telefone ou produto) · `POST /clientes` · `GET/PUT/DELETE /clientes/{id}` |
+| Envio | `PATCH /clientes/{id}/enviar` |
+| Dashboard | `GET /dashboard` (totais, pendentes, enviados e os 5 lembretes mais urgentes) |
+
 ## Decisões técnicas
 
 | Decisão | Por quê |
 | --- | --- |
-| JWT stateless com HMAC-256 | Um frontend estático simples, sem sessão no servidor. O segredo vem do ambiente e a aplicação não sobe com segredo curto. |
-| Isolamento por usuário no service | `buscarEntidade` só devolve clientes do dono. Um ID de outra loja responde 404, sem vazar se o registro existe. |
-| Mensagem gerada no backend | A regra fica num lugar só (`MensagemCliente`) e é testável. O frontend só exibe. |
-| Link `wa.me` em vez de API paga | Custo zero para o cliente e nenhum risco de bloqueio do número. A troca pela API oficial está isolada em `NotificacaoService`. |
+| JWT stateless com HMAC-256 | Frontend estático simples, sem sessão no servidor e escalável horizontalmente. |
+| Isolamento no service, não na tela | O filtro por loja vale para qualquer cliente HTTP, não só para a interface. |
+| Mensagem gerada no backend | Uma regra só, testável, e o frontend apenas exibe. |
+| Link `wa.me` em vez de API paga | Custo zero para a loja e nenhum risco de bloqueio do número. A troca pela API oficial fica isolada em `NotificacaoService`. |
+| Falhar na subida com segredo curto | Configuração insegura vira erro de inicialização, não vulnerabilidade silenciosa em produção. |
 
 ## Segurança
 
-- Senhas com **BCrypt**, tokens JWT com expiração configurável.
-- Segredos (banco, JWT, senha inicial) **somente por variáveis de ambiente**. Veja [`.env.example`](.env.example).
-- Login com **mensagem genérica** ("E-mail ou senha inválidos.") para não revelar quais e-mails existem.
-- Requisições sem token ou com token inválido/expirado recebem **401**, e o frontend volta ao login.
+- Senhas com **BCrypt**.
+- Sem token, ou com token inválido ou expirado, a resposta é **401**.
 - Rotas de clientes e dashboard exigem papel `ADMIN`. **Não há cadastro público.**
+- Administradores iniciais criados por seed só quando `ADMIN_INITIAL_PASSWORD` é informada.
+
+## Testes
+
+```bash
+./mvnw test
+```
+
+- **`JwtServiceTest`:** geração e validação de token, segredo errado, expiração e recusa de segredo curto.
+- **`AuthServiceTest`:** token com credenciais corretas, e a mesma mensagem para senha errada e e-mail inexistente.
+- **`MensagemClienteTest`:** texto com cliente, produto e dias desde a compra, texto genérico sem datas, preservação da mensagem personalizada e reconhecimento da mensagem automática.
+- **`NotificacaoServiceTest`:** marca como enviados os lembretes vencidos e não faz nada quando não há nenhum.
+- **`AgroNotifyApplicationTests`:** subida completa do contexto Spring com H2.
+
+Os testes rodam a cada push no **GitHub Actions**.
 
 ## Como rodar
 
 Pré-requisitos: **JDK 21** e **PostgreSQL**.
 
 ```bash
-# 1. Banco
 createdb agro_notify
-
-# 2. Variáveis (ou exporte uma a uma)
-cp .env.example .env   # edite os valores
+cp .env.example .env              # edite os valores
 export $(grep -v '^#' .env | xargs)
-
-# 3. Aplicação
-./mvnw spring-boot:run
+./mvnw spring-boot:run            # http://localhost:8081
 ```
-
-Acesse `http://localhost:8081/login.html` com `admin@agro.com` e a senha definida em `ADMIN_INITIAL_PASSWORD`.
 
 | Variável | Obrigatória | Descrição |
 | --- | --- | --- |
@@ -105,13 +116,9 @@ Acesse `http://localhost:8081/login.html` com `admin@agro.com` e a senha definid
 | `ADMIN_INITIAL_PASSWORD` | na 1ª vez | Senha dos administradores criados na primeira subida |
 | `PORT` | não | Porta HTTP, padrão `8081` |
 
-## Testes
+## Interface
 
-```bash
-./mvnw test
-```
-
-Os testes cobrem a geração e a validação de JWT (segredo errado, expiração e segredo curto), o login sem enumeração de usuários, as regras da mensagem automática, a rotina de lembretes e a subida completa do contexto Spring (com H2). Rodam a cada push no **GitHub Actions**.
+O Spring serve páginas estáticas em HTML, CSS e JavaScript (`src/main/resources/static`): login, dashboard e cadastro de clientes, com a logo de cada loja.
 
 ## Próximos passos
 
