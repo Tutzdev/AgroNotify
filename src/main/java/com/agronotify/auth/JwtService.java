@@ -40,7 +40,6 @@ public class JwtService {
                 .sign(algorithm);
     }
 
-    /** Retorna o e-mail do token, ou vazio se ele for inválido ou estiver expirado. */
     public Optional<String> validarToken(String token) {
         try {
             return Optional.of(JWT.require(algorithm)

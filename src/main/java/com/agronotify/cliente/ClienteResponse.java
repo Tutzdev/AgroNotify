@@ -28,23 +28,41 @@ public class ClienteResponse {
         this.statusEnvio = cliente.getStatusEnvio();
     }
 
-    public Long getId() {return id;}
+    public Long getId() {
+        return id;
+    }
 
-    public String getNome() {return nome;}
+    public String getNome() {
+        return nome;
+    }
 
-    public String getTelefone() {return telefone;}
+    public String getTelefone() {
+        return telefone;
+    }
 
-    public String getProduto() {return produto;}
+    public String getProduto() {
+        return produto;
+    }
 
-    public String getMensagem() {return mensagem;}
+    public String getMensagem() {
+        return mensagem;
+    }
 
-    public String getWhatsappLink() {return whatsappLink;}
+    public String getWhatsappLink() {
+        return whatsappLink;
+    }
 
-    public LocalDate getDataCadastro() {return dataCadastro;}
+    public LocalDate getDataCadastro() {
+        return dataCadastro;
+    }
 
-    public LocalDate getDataEnvio() {return dataEnvio;}
+    public LocalDate getDataEnvio() {
+        return dataEnvio;
+    }
 
-    public StatusEnvio getStatusEnvio() {return statusEnvio;}
+    public StatusEnvio getStatusEnvio() {
+        return statusEnvio;
+    }
 
     private static String gerarWhatsappLink(Cliente cliente) {
         return "https://wa.me/"

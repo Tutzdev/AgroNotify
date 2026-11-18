@@ -36,7 +36,6 @@ public class AdminSeeder implements CommandLineRunner {
         garantirUsuario("admin@petstore.com", "Administrador Pet Store");
         garantirUsuario("admin@luci.com", "Administrador Luci");
 
-        // Clientes existentes antes do isolamento ficam no administrador original.
         agro.ifPresent(administrador -> {
             for (Cliente cliente : clienteRepository.findAll()) {
                 if (cliente.getUsuario() == null) {
@@ -47,10 +46,8 @@ public class AdminSeeder implements CommandLineRunner {
         });
     }
 
-    /**
-     * Cria o administrador se ele ainda não existe. A senha de quem já existe nunca é trocada,
-     * exceto quando ela ainda não está em BCrypt.
-     */
+     // Cria o administrador se ele ainda não existe. A senha de quem já existe nunca é trocada, exceto quando ela ainda não está em BCrypt.
+
     private Optional<Usuario> garantirUsuario(String email, String nome) {
         Usuario usuario = usuarioRepository.findByEmail(email).orElseGet(Usuario::new);
         boolean precisaDeSenha = usuario.getSenha() == null || !usuario.getSenha().startsWith("$2");

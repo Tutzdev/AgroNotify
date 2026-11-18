@@ -52,7 +52,12 @@ public class ClienteService {
     public List<ClienteResponse> buscarPorTermo(String termo, Usuario usuario) {
         return clienteRepository
                 .findByUsuarioAndNomeContainingIgnoreCaseOrUsuarioAndTelefoneContainingIgnoreCaseOrUsuarioAndProdutoContainingIgnoreCase(
-                        usuario, termo, usuario, termo, usuario, termo
+                        usuario, 
+                        termo, 
+                        usuario, 
+                        termo, 
+                        usuario, 
+                        termo
                 )
                 .stream()
                 .sorted(ORDEM_PRIORIDADE)
